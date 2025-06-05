@@ -5,8 +5,11 @@ echo "🔧 Instalando ScannerDNS..."
 # Caminho padrão para instalação
 INSTALL_DIR="$HOME/ScannerDNS"
 
-# Remove instalação anterior, se existir
-rm -rf "$INSTALL_DIR"
+# Remove a pasta antiga se já existir
+if [ -d "$INSTALL_DIR" ]; then
+  echo "🧹 Removendo pasta antiga $INSTALL_DIR..."
+  rm -rf "$INSTALL_DIR"
+fi
 
 # Clona o repositório do GitHub
 git clone https://github.com/ffontinele/scanner-dns.git "$INSTALL_DIR" || {
@@ -23,7 +26,6 @@ chmod +x $PREFIX/bin/scanner
 
 echo "✅ Instalado com sucesso!"
 echo "👉 Agora você pode usar o comando: scanner"
-
 echo "🔧 Instalando o Scanner de Domínios..."
 
 DEST="$HOME/Documentos/DOMINIOS_SCANEADOS_OK"
@@ -36,7 +38,3 @@ chmod +x "$DEST/scanner.sh"
 echo "✅ Instalado com sucesso em: $DEST"
 echo "👉 Edite o arquivo 'lista.txt' com seus domínios."
 echo "👉 Execute com: ./scanner.sh"
-
-GitHub (https://github.com/ffontinele/scanner-dns.git)
-ffontinele/scanner-dns
-escript para escanear domínios e gerar payloads automáticas (SNI, HTTP) - ffontinele/scanner-dns
