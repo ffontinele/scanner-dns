@@ -1,32 +1,34 @@
 #!/bin/bash
 
-echo -e "\n📦 Instalando o ScannerDNS...\n"
+echo -e "📦 Instalando o ScannerDNS...\n"
 
-# Caminho padrão de instalação
-INSTALL_DIR=~/Documentos/DOMINIOS_SCANEADOS_OK
+# Caminho base no Termux
+DEST="$HOME/Documentos/DOMINIOS_SCANEADOS_OK"
 
-# Remove a instalação anterior, se existir
-if [ -d "$INSTALL_DIR" ]; then
-    echo "🧹 Removendo instalação anterior..."
-    rm -rf "$INSTALL_DIR"
+echo -e "🧹 Removendo instalação anterior..."
+rm -rf "$DEST"
+rm -f "$PREFIX/bin/scanner"
+
+# Clonar projeto
+git clone https://github.com/ffontinele/scanner-dns.git "$DEST"
+
+# Garantir permissões de execução
+chmod +x "$DEST/scanner.sh"
+
+# Criar atalho global
+ln -sf "$DEST/scanner.sh" "$PREFIX/bin/scanner"
+
+# Criar lista de domínios se não existir
+LISTA="$DEST/lista.txt"
+if [ ! -f "$LISTA" ]; then
+  echo -e "📝 Criando lista.txt com domínios padrão..."
+  echo -e "google.com\nuol.com.br\nglobo.com" > "$LISTA"
 fi
 
-# Clona o repositório novamente
-git clone https://github.com/ffontinele/scanner-dns "$INSTALL_DIR"
+echo -e "\n✅ Instalado com sucesso em: $DEST"
+echo -e "✏️  Edite o arquivo 'lista.txt' com seus domínios."
+echo -e "👉 Execute com: scanner"
 
-# Cria lista.txt com domínios padrão, se não existir
-if [ ! -f "$INSTALL_DIR/lista.txt" ]; then
-    echo -e "google.com\nuol.com.br\nglobo.com" > "$INSTALL_DIR/lista.txt"
-    echo "📝 Arquivo 'lista.txt' criado com domínios padrão."
-fi
-
-# Copia o atalho 'scanner' para uso global no Termux ou Linux
-cp "$INSTALL_DIR/scanner.sh" /data/data/com.termux/files/usr/bin/scanner 2>/dev/null || sudo cp "$INSTALL_DIR/scanner.sh" /usr/local/bin/scanner
-chmod +x /data/data/com.termux/files/usr/bin/scanner 2>/dev/null || sudo chmod +x /usr/local/bin/scanner
-
-# Dá permissão de execução ao script principal
-chmod +x "$INSTALL_DIR/scanner.sh"
-
-echo -e "\n✅ Instalado com sucesso em: $INSTALL_DIR"
-echo "📝 Edite o arquivo 'lista.txt' com seus domínios."
-echo "👉 Execute com: scanner"
+GitHub (https://github.com/ffontinele/scanner-dns.git)
+ffontinele/scanner-dns
+escript para escanear domínios e gerar payloads automáticas (SNI, HTTP) - ffontinele/scanner-dns
