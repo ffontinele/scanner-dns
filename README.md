@@ -6,8 +6,7 @@ Ferramenta para análise e validação de domínios via DNS e HTTP, útil para e
 ## 📥 Instalação rápida
 
 ```bash
-git clone https://github.com/ffontinele/scanner-dns.git && cd scanner-dns
-chmod +x scan.sh
+git clone https://github.com/ffontinele/scanner-dns.git && cd scanner-dns && chmod +x scan.sh
 ```
 
 ## 🚀 Uso básico
