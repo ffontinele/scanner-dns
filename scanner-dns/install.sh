@@ -13,18 +13,24 @@ mkdir -p "$INSTALL_DIR"
 # Clona o repositório
 git clone https://github.com/ffontinele/scanner-dns "$INSTALL_DIR"
 
-# Dá permissão de execução
-chmod +x "$INSTALL_DIR/scanner.sh"
+# Garante que o script principal existe e aplica permissão
+if [ -f "$INSTALL_DIR/scanner.sh" ]; then
+    chmod +x "$INSTALL_DIR/scanner.sh"
+else
+    echo "❌ Erro: scanner.sh não encontrado em $INSTALL_DIR"
+    exit 1
+fi
 
-# Cria link simbólico para execução direta (atalho 'scanner')
+# Cria link simbólico para comando global no Termux
 BIN_PATH="$PREFIX/bin/scanner"
 rm -f "$BIN_PATH"
 ln -s "$INSTALL_DIR/scanner.sh" "$BIN_PATH"
 
-# Gera arquivo lista.txt com domínios padrão
+# Cria lista padrão
 echo -e "google.com\nuol.com.br\nglobo.com" > "$INSTALL_DIR/lista.txt"
-echo -e "📝 Arquivo 'lista.txt' criado com domínios padrão."
+echo -e "📝 Criando lista.txt com domínios padrão..."
 
+# Mensagem final
 echo -e "\n✅ Instalado com sucesso em: $INSTALL_DIR"
 echo "🖋️  Edite o arquivo 'lista.txt' com seus domínios."
 echo "👉 Execute com: scanner"
