@@ -1,30 +1,30 @@
 #!/bin/bash
 
-echo -e "📦 Instalando o ScannerDNS...\n"
+echo -e "\n🛠️  Instalando o ScannerDNS...\n"
 
-# Caminho base no Termux
-DEST="$HOME/Documentos/DOMINIOS_SCANEADOS_OK"
+# Caminho de instalação
+INSTALL_DIR="$HOME/Documentos/DOMINIOS_SCANEADOS_OK"
 
-echo -e "🧹 Removendo instalação anterior..."
-rm -rf "$DEST"
-rm -f "$PREFIX/bin/scanner"
+# Remove a instalação anterior (se existir)
+echo "🧹  Removendo instalação anterior..."
+rm -rf "$INSTALL_DIR"
+mkdir -p "$INSTALL_DIR"
 
-# Clonar projeto
-git clone https://github.com/ffontinele/scanner-dns.git "$DEST"
+# Clona o repositório
+git clone https://github.com/ffontinele/scanner-dns "$INSTALL_DIR"
 
-# Garantir permissões de execução
-chmod +x "$DEST/scanner.sh"
+# Dá permissão de execução
+chmod +x "$INSTALL_DIR/scanner.sh"
 
-# Criar atalho global
-ln -sf "$DEST/scanner.sh" "$PREFIX/bin/scanner"
+# Cria link simbólico para execução direta (atalho 'scanner')
+BIN_PATH="$PREFIX/bin/scanner"
+rm -f "$BIN_PATH"
+ln -s "$INSTALL_DIR/scanner.sh" "$BIN_PATH"
 
-# Criar lista de domínios se não existir
-LISTA="$DEST/lista.txt"
-if [ ! -f "$LISTA" ]; then
-  echo -e "📝 Criando lista.txt com domínios padrão..."
-  echo -e "google.com\nuol.com.br\nglobo.com" > "$LISTA"
-fi
+# Gera arquivo lista.txt com domínios padrão
+echo -e "google.com\nuol.com.br\nglobo.com" > "$INSTALL_DIR/lista.txt"
+echo -e "📝 Arquivo 'lista.txt' criado com domínios padrão."
 
-echo -e "\n✅ Instalado com sucesso em: $DEST"
-echo -e "✏️  Edite o arquivo 'lista.txt' com seus domínios."
-echo -e "👉 Execute com: scanner"
+echo -e "\n✅ Instalado com sucesso em: $INSTALL_DIR"
+echo "🖋️  Edite o arquivo 'lista.txt' com seus domínios."
+echo "👉 Execute com: scanner"
