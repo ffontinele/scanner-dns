@@ -1,8 +1,9 @@
 #!/bin/bash
-# Caminho raiz (compatível com Linux e Termux)
+# Caminho raiz baseado no local do script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_DIR="$HOME/Documentos/DOMINIOS_SCANEADOS_OK"
 PAYLOAD_DIR="$BASE_DIR/payloads"
-LISTA="lista.txt"
+LISTA="$SCRIPT_DIR/lista.txt"
 
 # Criar pastas necessárias
 mkdir -p "$PAYLOAD_DIR"
