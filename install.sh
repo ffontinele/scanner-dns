@@ -13,12 +13,13 @@ rm -f "$LINK_NAME"
 echo -e "\n📥 Baixando arquivos do GitHub..."
 git clone https://github.com/ffontinele/scanner-dns.git "$FINAL_DIR"
 
-echo -e "\n🚧 Criando atalho global..."
-
-mkdir -p "$BIN_PATH"
-
-echo -e "#!/bin/bash\nbash \"$FINAL_DIR/scanner.sh\" \"\$@\"" > "$LINK_NAME"
-chmod +x "$LINK_NAME"
+# Criação de atalho apenas se não existir
+if [ ! -f "$LINK_NAME" ]; then
+    echo -e "\n🚧 Criando atalho global..."
+    mkdir -p "$BIN_PATH"
+    echo -e "#!/bin/bash\nbash \"$FINAL_DIR/scanner.sh\" \"\$@\"" > "$LINK_NAME"
+    chmod +x "$LINK_NAME"
+fi
 
 echo -e "\n✅ ScannerDNS instalado com sucesso!"
 echo -e "📁 Diretório: $FINAL_DIR"
