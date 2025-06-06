@@ -1,122 +1,35 @@
 #!/bin/bash
-# Caminho raiz baseado no local do script
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BASE_DIR="$HOME/Documentos/DOMINIOS_SCANEADOS_OK"
-PAYLOAD_DIR="$BASE_DIR/payloads"
-LISTA="$SCRIPT_DIR/lista.txt"
 
-# Criar pastas necessárias
-mkdir -p "$PAYLOAD_DIR"
+PASTA_DESTINO="$HOME/Documentos/ScannerDNS"
+ATALHO="/data/data/com.termux/files/usr/bin/scanner"
+[[ ! -d "/data/data" ]] && ATALHO="/usr/local/bin/scanner"
 
-# Arquivos de saída
-ARQ_OK="$BASE_DIR/validos_sni.txt"
-ARQ_HTTP="$BASE_DIR/validos_http.txt"
-ARQ_RELATORIO="$BASE_DIR/relatorio.csv"
-ARQ_JSON="$BASE_DIR/relatorio.json"
+echo -e "\e[1;32m🛠 Iniciando a instalação do ScannerDNS...\e[0m"
 
-# Limpar arquivos anteriores
-> "$ARQ_OK"
-> "$ARQ_HTTP"
-> "$ARQ_RELATORIO"
-echo "[" > "$ARQ_JSON"
+if [ -d "$PASTA_DESTINO" ]; then
+    echo -e "\e[1;33m⚠️ Pasta existente encontrada. Removendo...\e[0m"
+    rm -rf "$PASTA_DESTINO"
+fi
 
-LINHAS=$(wc -l < "$LISTA")
-COUNT=0
+mkdir -p "$PASTA_DESTINO"
 
-while IFS= read -r DOM; do
-  COUNT=$((COUNT + 1))
-  echo -e "\n🔵 Testando: \e[1m$DOM\e[0m"
+echo -e "\e[1;34m⬇️ Baixando arquivos do projeto...\e[0m"
 
-  # Teste DNS
-  if ping -c 1 -W 1 "$DOM" &>/dev/null; then
-    DNS_OK="✅"
-    DNS_BOOL=true
-  else
-    DNS_OK="❌"
-    DNS_BOOL=false
-  fi
+curl -sSL "https://raw.githubusercontent.com/ffontinele/scanner-dns/main/.scanner.sh" -o "$PASTA_DESTINO/.scanner.sh"
+curl -sSL "https://raw.githubusercontent.com/ffontinele/scanner-dns/main/download.sh" -o "$PASTA_DESTINO/download.sh"
 
-  # Teste HTTP
-  if curl -s --max-time 5 "http://$DOM" >/dev/null; then
-    HTTP_OK="✅"
-    HTTP_BOOL=true
-    echo "$DOM" >> "$ARQ_HTTP"
-  else
-    HTTP_OK="❌"
-    HTTP_BOOL=false
-  fi
+if [[ ! -s "$PASTA_DESTINO/.scanner.sh" || ! -s "$PASTA_DESTINO/download.sh" ]]; then
+    echo -e "\e[1;31m❌ Falha ao baixar os arquivos. Verifique sua conexão com a internet.\e[0m"
+    exit 1
+fi
 
-  # Teste porta 80
-  if timeout 3 bash -c "</dev/tcp/$DOM/80" &>/dev/null; then
-    P80_OK="✅"
-    P80_BOOL=true
-  else
-    P80_OK="❌"
-    P80_BOOL=false
-  fi
+chmod +x "$PASTA_DESTINO/.scanner.sh"
+chmod +x "$PASTA_DESTINO/download.sh"
 
-  # Teste porta 443
-  if timeout 3 bash -c "</dev/tcp/$DOM/443" &>/dev/null; then
-    P443_OK="✅"
-    P443_BOOL=true
-    echo "$DOM" >> "$ARQ_OK"
-  else
-    P443_OK="❌"
-    P443_BOOL=false
-  fi
+echo -e "google.com\nuol.com.br\nglobo.com" > "$PASTA_DESTINO/lista.txt"
 
-  echo -e " - DNS:      $DNS_OK"
-  echo -e " - HTTP:     $HTTP_OK"
-  echo -e " - Porta 80: $P80_OK"
-  echo -e " - Porta 443:$P443_OK"
+echo -e "#!/bin/bash\nbash \"$PASTA_DESTINO/.scanner.sh\"" > "$ATALHO"
+chmod +x "$ATALHO"
 
-  if $DNS_BOOL && $HTTP_BOOL && $P443_BOOL; then
-    echo -e "✅ \e[1;32mDomínio válido para SNI\e[0m"
-
-    PAYLOAD_FILE="$PAYLOAD_DIR/${DOM//\//_}.payloads.txt"
-
-    {
-      echo "[GET Simples]"
-      echo -e "GET / HTTP/1.1"
-      echo -e "Host: $DOM"
-      echo -e "Connection: Keep-Alive\n"
-
-      echo "[WebSocket]"
-      echo -e "GET / HTTP/1.1"
-      echo -e "Host: $DOM"
-      echo -e "Upgrade: websocket"
-      echo -e "Connection: Upgrade"
-      echo -e "Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw=="
-      echo -e "Sec-WebSocket-Version: 13\n"
-
-      echo "[TLS SNI]"
-      echo -e "TLS handshake with SNI set to: $DOM\n"
-
-      echo "[HTTP/2]"
-      echo -e ":method: GET"
-      echo -e ":scheme: https"
-      echo -e ":authority: $DOM"
-      echo -e ":path: /\n"
-    } > "$PAYLOAD_FILE"
-
-  else
-    echo -e "❌ \e[1;31mDomínio com falhas.\e[0m"
-  fi
-
-  echo "$DOM,$DNS_BOOL,$HTTP_BOOL,$P80_BOOL,$P443_BOOL" >> "$ARQ_RELATORIO"
-
-  echo "  {" >> "$ARQ_JSON"
-  echo "    \"dominio\": \"$DOM\"," >> "$ARQ_JSON"
-  echo "    \"dns\": $DNS_BOOL," >> "$ARQ_JSON"
-  echo "    \"http\": $HTTP_BOOL," >> "$ARQ_JSON"
-  echo "    \"porta_80\": $P80_BOOL," >> "$ARQ_JSON"
-  echo "    \"porta_443\": $P443_BOOL" >> "$ARQ_JSON"
-  echo -n "  }" >> "$ARQ_JSON"
-  [ $COUNT -lt $LINHAS ] && echo "," >> "$ARQ_JSON" || echo "" >> "$ARQ_JSON"
-
-done < "$LISTA"
-
-echo "]" >> "$ARQ_JSON"
-
-echo -e "\n✅ \e[1;32mVarredura concluída!\e[0m"
-echo "Arquivos gerados em: $BASE_DIR"
+echo -e "\e[1;32m✅ Instalação concluída com sucesso!\e[0m"
+echo -e "\e[1;36mPara iniciar, digite: \e[1;33mscanner\e[0m"
