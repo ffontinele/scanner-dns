@@ -4,7 +4,7 @@ PASTA_DESTINO="$HOME/Documentos/ScannerDNS"
 ATALHO="/data/data/com.termux/files/usr/bin/scanner"
 [[ ! -d "/data/data" ]] && ATALHO="/usr/local/bin/scanner"
 
-echo -e "\e[1;32m🛠️ Iniciando a instalação do ScannerDNS...\e[0m"
+echo -e "\e[1;32m🛠 Iniciando a instalação do ScannerDNS...\e[0m"
 
 if [ -d "$PASTA_DESTINO" ]; then
     echo -e "\e[1;33m⚠️ Pasta existente encontrada. Removendo...\e[0m"
@@ -15,8 +15,8 @@ mkdir -p "$PASTA_DESTINO"
 
 echo -e "\e[1;34m⬇️ Baixando arquivos do projeto...\e[0m"
 
-curl -sSL "https://raw.githubusercontent.com/ffontinele/scanner-dns/main/scanner-dns/.scanner.sh" -o "$PASTA_DESTINO/.scanner.sh"
-curl -sSL "https://raw.githubusercontent.com/ffontinele/scanner-dns/main/scanner-dns/download.sh" -o "$PASTA_DESTINO/download.sh"
+curl -sSL "https://raw.githubusercontent.com/ffontinele/scanner-dns/main/.scanner.sh" -o "$PASTA_DESTINO/.scanner.sh"
+curl -sSL "https://raw.githubusercontent.com/ffontinele/scanner-dns/main/download.sh" -o "$PASTA_DESTINO/download.sh"
 
 if [[ ! -s "$PASTA_DESTINO/.scanner.sh" || ! -s "$PASTA_DESTINO/download.sh" ]]; then
     echo -e "\e[1;31m❌ Falha ao baixar os arquivos. Verifique sua conexão com a internet.\e[0m"
