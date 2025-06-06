@@ -1,40 +1,44 @@
 #!/bin/bash
 
-echo -e "\n⚙️  Instalando o ScannerDNS...\n"
+echo -e "\n🛠️  Instalando o ScannerDNS...\n"
 
-FINAL_DIR="$HOME/Documentos/ScannerDNS"
-BIN_PATH="$HOME/.local/bin"
-LINK_NAME="$BIN_PATH/scanner"
+# Diretório final
+if [ "$PREFIX" ]; then
+  FINAL_DIR="$HOME/Documentos/ScannerDNS"
+  BIN_DIR="$PREFIX/bin"
+else
+  FINAL_DIR="$HOME/Documentos/ScannerDNS"
+  BIN_DIR="/usr/local/bin"
+fi
 
-echo "🧹 Limpando instalações anteriores..."
+# Limpando instalações anteriores
+echo -e "🧹 Limpando instalações anteriores..."
 rm -rf "$FINAL_DIR"
-rm -f "$LINK_NAME"
+rm -f "$BIN_DIR/scanner"
 
-echo -e "\n📥 Baixando arquivos do GitHub..."
+# Baixando repositório
+echo -e "📥 Baixando arquivos do GitHub..."
 git clone https://github.com/ffontinele/scanner-dns.git "$FINAL_DIR"
 
-# Garantindo permissão de execução
-chmod +x "$FINAL_DIR/scanner.sh"
-
 # Criando lista.txt padrão
-echo -e "\n🌐 Criando lista padrão de domínios (lista.txt)..."
+echo -e "🌐 Criando lista padrão de domínios (lista.txt)..."
 cat <<EOF > "$FINAL_DIR/lista.txt"
 www.google.com
 www.cloudflare.com
 www.wikipedia.org
 EOF
 
-# Criando atalho se não existir
-if [ ! -f "$LINK_NAME" ]; then
-    echo -e "\n🚧 Criando atalho global..."
-    mkdir -p "$BIN_PATH"
-    echo -e "#!/bin/bash\nbash \"$FINAL_DIR/scanner.sh\" \"\$@\"" > "$LINK_NAME"
-    chmod +x "$LINK_NAME"
-fi
+# Garantindo permissão de execução
+chmod +x "$FINAL_DIR/scanner.sh"
+
+# Criando atalho global
+echo -e "🔗 Criando atalho global..."
+echo -e "#!/bin/bash\nbash \"$FINAL_DIR/scanner.sh\" \"\$@\"" > "$BIN_DIR/scanner"
+chmod +x "$BIN_DIR/scanner"
 
 echo -e "\n✅ ScannerDNS instalado com sucesso!"
 echo -e "📁 Diretório: $FINAL_DIR"
-echo -e "📌 Use o comando: \e[1mscanner\e[0m para iniciar."
+echo -e "📌 Use o comando: \033[1;32mscanner\033[0m para iniciar.\n"
 
 GitHub (https://github.com/ffontinele/scanner-dns.git)
 ffontinele/scanner-dns
