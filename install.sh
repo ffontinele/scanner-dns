@@ -1,52 +1,45 @@
 #!/bin/bash
 
-# Caminho base onde será instalado o ScannerDNS
-PASTA="$HOME/Documentos/ScannerDNS"
+# Caminho da pasta de destino
+PASTA_DESTINO="$HOME/Documentos/ScannerDNS"
 
-# Criando pasta se não existir
-mkdir -p "$PASTA"
+# Atalho global
+ATALHO="/data/data/com.termux/files/usr/bin/scanner"
+[[ ! -d "/data/data" ]] && ATALHO="/usr/local/bin/scanner"
 
-# Clonando ou atualizando repositório
-if [ -d "$PASTA/.git" ]; then
-    echo "🔄 Atualizando projeto existente..."
-    git -C "$PASTA" pull
-else
-    echo "📥 Baixando projeto ScannerDNS..."
-    git clone https://github.com/ffontinele/scanner-dns "$PASTA"
+# Mensagem de boas-vindas
+echo -e "\e[1;32m🛠️ Iniciando a instalação do ScannerDNS...\e[0m"
+
+# Remover a pasta se já existir
+if [ -d "$PASTA_DESTINO" ]; then
+    echo -e "\e[1;33m⚠️ Pasta existente encontrada. Removendo...\e[0m"
+    rm -rf "$PASTA_DESTINO"
 fi
 
-# Indo para o diretório
-cd "$PASTA" || exit 1
+# Criar a nova pasta
+mkdir -p "$PASTA_DESTINO"
 
-# Garantir que lista.txt existe e tem alguns domínios
-if [ ! -s lista.txt ]; then
-    echo "🌐 Criando arquivo lista.txt com domínios de teste..."
-    cat <<EOF > lista.txt
-www.google.com
-www.cloudflare.com
-www.wikipedia.org
-www.youtube.com
-EOF
-else
-    echo "📄 lista.txt já existe e não está vazia."
+# Baixar os arquivos principais
+echo -e "\e[1;34m⬇️ Baixando arquivos do projeto...\e[0m"
+wget -qO "$PASTA_DESTINO/.scanner.sh" https://raw.githubusercontent.com/ffontinele/scanner-dns/main/scanner-dns/.scanner.sh
+wget -qO "$PASTA_DESTINO/download.sh" https://raw.githubusercontent.com/ffontinele/scanner-dns/main/scanner-dns/download.sh
+
+# Verificar se arquivos foram baixados com sucesso
+if [[ ! -s "$PASTA_DESTINO/.scanner.sh" || ! -s "$PASTA_DESTINO/download.sh" ]]; then
+    echo -e "\e[1;31m❌ Falha ao baixar os arquivos. Verifique sua conexão com a internet.\e[0m"
+    exit 1
 fi
 
-# Tornando scanner.sh executável
-chmod +x scanner.sh
+# Dar permissões de execução
+chmod +x "$PASTA_DESTINO/.scanner.sh"
+chmod +x "$PASTA_DESTINO/download.sh"
 
-# Criando atalho global 'scanner'
-mkdir -p "$HOME/bin"
-ln -sf "$PASTA/scanner.sh" "$HOME/bin/scanner"
+# Criar arquivo lista.txt com domínios padrão
+echo -e "google.com\nuol.com.br\nglobo.com" > "$PASTA_DESTINO/lista.txt"
 
-# Garantindo que o $HOME/bin está no PATH
-if ! echo "$PATH" | grep -q "$HOME/bin"; then
-    echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.bashrc"
-    echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.profile"
-    echo '🔧 PATH atualizado. Reinicie o Termux ou terminal para aplicar.'
-fi
+# Criar o comando global 'scanner'
+echo -e "#!/bin/bash\nbash \"$PASTA_DESTINO/.scanner.sh\"" > "$ATALHO"
+chmod +x "$ATALHO"
 
-# Confirmação final
-echo
-echo "✅ Instalação concluída!"
-echo "📁 Caminho: $PASTA"
-echo "🚀 Use o comando: scanner"
+echo -e "\e[1;32m✅ Instalação concluída com sucesso!\e[0m"
+echo -e "\e[1;36mPara iniciar, digite: \e[1;33mscanner\e[0m"
