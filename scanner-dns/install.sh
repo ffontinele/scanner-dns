@@ -28,7 +28,3 @@ fi
 echo -e "\n✅ Instalado com sucesso em: $DEST"
 echo -e "✏️  Edite o arquivo 'lista.txt' com seus domínios."
 echo -e "👉 Execute com: scanner"
-
-GitHub (https://github.com/ffontinele/scanner-dns.git)
-ffontinele/scanner-dns
-escript para escanear domínios e gerar payloads automáticas (SNI, HTTP) - ffontinele/scanner-dns
