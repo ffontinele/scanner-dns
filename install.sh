@@ -1,42 +1,25 @@
 #!/bin/bash
 
-echo -e "\n🛠️  Instalando o ScannerDNS...\n"
+echo -e "\n⚙️  Instalando o ScannerDNS...\n"
 
-INSTALL_DIR="$HOME/Documentos/PROJETOS_SCANNERS_OK"
-PROJECT_FOLDER="ScannerDNS"
-FINAL_DIR="$INSTALL_DIR/$PROJECT_FOLDER"
+FINAL_DIR="$HOME/Documentos/ScannerDNS"
 BIN_PATH="$HOME/.local/bin"
+LINK_NAME="$BIN_PATH/scanner"
 
-# Remove tudo se já existir
-echo -e "🧹 Limpando instalações anteriores..."
+echo "🧹 Limpando instalações anteriores..."
 rm -rf "$FINAL_DIR"
+rm -f "$LINK_NAME"
 
-# Cria diretório de destino
-mkdir -p "$INSTALL_DIR"
-cd "$INSTALL_DIR" || exit 1
+echo -e "\n📥 Baixando arquivos do GitHub..."
+git clone https://github.com/ffontinele/scanner-dns.git "$FINAL_DIR"
 
-echo -e "📥 Baixando arquivos do GitHub...\n"
-git clone https://github.com/ffontinele/scanner-dns "$PROJECT_FOLDER"
+echo -e "\n🚧 Criando atalho global..."
 
-# Torna o script executável
-chmod +x "$FINAL_DIR/scanner.sh"
-
-# Garante que a pasta ~/.local/bin existe
 mkdir -p "$BIN_PATH"
 
-# Cria atalho global
-ln -sf "$FINAL_DIR/scanner.sh" "$BIN_PATH/scanner"
+echo -e "#!/bin/bash\nbash \"$FINAL_DIR/scanner.sh\" \"\$@\"" > "$LINK_NAME"
+chmod +x "$LINK_NAME"
 
-# Adiciona ~/.local/bin ao PATH se necessário
-if [[ ":$PATH:" != *":$BIN_PATH:"* ]]; then
-    echo 'export PATH="$PATH:$HOME/.local/bin"' >> "$HOME/.bashrc"
-    source "$HOME/.bashrc" 2>/dev/null
-fi
-
-# Mensagem final
-if command -v scanner >/dev/null 2>&1; then
-    echo -e "\n✅ Instalação concluída com sucesso!"
-    echo -e "📌 Execute com o comando: \033[1mscanner\033[0m"
-else
-    echo -e "\n⚠️  Atalho global não criado."
-    echo -e "👉 Execute com: bash $FINAL_DIR/scanner.sh"
+echo -e "\n✅ ScannerDNS instalado com sucesso!"
+echo -e "📁 Diretório: $FINAL_DIR"
+echo -e "📌 Use o comando: \e[1mscanner\e[0m para iniciar."
