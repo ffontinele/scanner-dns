@@ -1,56 +1,29 @@
 #!/bin/bash
 
-# Caminho base onde será instalado o ScannerDNS
+# Caminho da instalação
 PASTA="$HOME/Documentos/ScannerDNS"
 
-# Criando pasta se não existir
+# Cria pasta de instalação
 mkdir -p "$PASTA"
 
-# Clonando ou atualizando repositório
-if [ -d "$PASTA/.git" ]; then
-    echo "🔄 Atualizando projeto existente..."
-    git -C "$PASTA" pull
-else
-    echo "📥 Baixando projeto ScannerDNS..."
-    git clone https://github.com/ffontinele/scanner-dns "$PASTA"
+# Move arquivos para a pasta
+mv scanner.sh install.sh testador.sh lista.txt "$PASTA" 2>/dev/null
+
+# Dá permissões
+chmod +x "$PASTA/"*.sh
+
+# Cria o comando global 'scanner'
+echo -e "#!/bin/bash\nbash \"$PASTA/scanner.sh\"" > "$HOME/.scanner"
+chmod +x "$HOME/.scanner"
+
+# Adiciona ao PATH se não estiver
+if ! grep -q 'export PATH=$HOME' ~/.bashrc 2>/dev/null; then
+    echo 'export PATH=$HOME:$PATH' >> ~/.bashrc
+fi
+if ! grep -q 'export PATH=$HOME' ~/.profile 2>/dev/null; then
+    echo 'export PATH=$HOME:$PATH' >> ~/.profile
 fi
 
-# Indo para o diretório
-cd "$PASTA" || exit 1
-
-# Garantir que lista.txt existe e tem alguns domínios
-if [ ! -s lista.txt ]; then
-    echo "🌐 Criando arquivo lista.txt com domínios de teste..."
-    cat <<EOF > lista.txt
-www.google.com
-www.cloudflare.com
-www.wikipedia.org
-www.youtube.com
-EOF
-else
-    echo "📄 lista.txt já existe e não está vazia."
-fi
-
-# Tornando scanner.sh executável
-chmod +x scanner.sh
-
-# Criando atalho global 'scanner'
-mkdir -p "$HOME/bin"
-ln -sf "$PASTA/scanner.sh" "$HOME/bin/scanner"
-
-# Garantindo que o $HOME/bin está no PATH
-if ! echo "$PATH" | grep -q "$HOME/bin"; then
-    echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.bashrc"
-    echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.profile"
-    echo '🔧 PATH atualizado. Reinicie o Termux ou terminal para aplicar.'
-fi
-
-# Confirmação final
 echo
 echo "✅ Instalação concluída!"
-echo "📁 Caminho: $PASTA"
-echo "🚀 Use o comando: scanner"
-
-GitHub (https://github.com/ffontinele/scanner-dns)
-ffontinele/scanner-dns
-escript para escanear domínios e gerar payloads automáticas (SNI, HTTP) - ffontinele/scanner-dns
+echo "➡️  Agora você pode rodar: scanner"
