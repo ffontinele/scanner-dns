@@ -8,7 +8,7 @@ ATALHO="/data/data/com.termux/files/usr/bin/scanner"
 [[ ! -d "/data/data" ]] && ATALHO="/usr/local/bin/scanner"
 
 # Mensagem de boas-vindas
-echo -e "\e[1;32m🛠️ Iniciando a instalação do ScannerDNS...\e[0m"
+echo -e "\e[1;32m🛠 Iniciando a instalação do ScannerDNS...\e[0m"
 
 # Remover a pasta se já existir
 if [ -d "$PASTA_DESTINO" ]; then
