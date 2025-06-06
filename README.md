@@ -6,6 +6,7 @@ Ferramenta para análise e validação de domínios via DNS e HTTP, útil para e
 ## 📥 Instalação rápida
 
 curl -sL https://raw.githubusercontent.com/ffontinele/scanner-dns/refs/heads/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/ffontinele/scanner-dns/main/install.sh | bash
 
 ## 🚀 Uso básico
 
