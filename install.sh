@@ -3,34 +3,29 @@
 echo -e "\n🛠️  Instalando o ScannerDNS...\n"
 
 # Caminho de instalação
-INSTALL_DIR="$HOME/Documentos/DOMINIOS_SCANEADOS_OK"
+INSTALL_DIR="$HOME/Documentos/PROJETOS_SCANNERS_OK"
 
-# Remove a instalação anterior (se existir)
-echo "🧹  Removendo instalação anterior..."
-rm -rf "$INSTALL_DIR"
+# Nome da pasta final do projeto
+PROJECT_FOLDER="ScannerDNS"
+
+# Caminho completo final
+FINAL_DIR="$INSTALL_DIR/$PROJECT_FOLDER"
+
+# Clonando o repositório atualizado
 mkdir -p "$INSTALL_DIR"
+cd "$INSTALL_DIR" || exit
 
-# Clona o repositório
-git clone https://github.com/ffontinele/scanner-dns "$INSTALL_DIR"
+echo -e "📥 Baixando arquivos do GitHub...\n"
+git clone https://github.com/ffontinele/scanner-dns "$PROJECT_FOLDER"
 
-# Garante que o script principal existe e aplica permissão
-if [ -f "$INSTALL_DIR/scanner.sh" ]; then
-    chmod +x "$INSTALL_DIR/scanner.sh"
+# Permissões e atalho
+chmod +x "$FINAL_DIR/scanner.sh"
+ln -sf "$FINAL_DIR/scanner.sh" "$HOME/.local/bin/scanner"
+
+# Verifica se o comando scanner está disponível
+if command -v scanner >/dev/null 2>&1; then
+    echo -e "\n✅ Instalação concluída com sucesso!"
+    echo -e "📌 Você pode executar o scanner com o comando: \033[1mscanner\033[0m"
 else
-    echo "❌ Erro: scanner.sh não encontrado em $INSTALL_DIR"
-    exit 1
-fi
-
-# Cria link simbólico para comando global no Termux
-BIN_PATH="$PREFIX/bin/scanner"
-rm -f "$BIN_PATH"
-ln -s "$INSTALL_DIR/scanner.sh" "$BIN_PATH"
-
-# Cria lista padrão
-echo -e "google.com\nuol.com.br\nglobo.com" > "$INSTALL_DIR/lista.txt"
-echo -e "📝 Criando lista.txt com domínios padrão..."
-
-# Mensagem final
-echo -e "\n✅ Instalado com sucesso em: $INSTALL_DIR"
-echo "🖋️  Edite o arquivo 'lista.txt' com seus domínios."
-echo "👉 Execute com: scanner"
+    echo -e "\n⚠️  Instalação concluída, mas o atalho global não foi criado."
+    echo -e "👉 Execute com: bash $FINAL_DIR/scanner.sh"
