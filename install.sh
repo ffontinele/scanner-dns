@@ -1,45 +1,52 @@
 #!/bin/bash
 
-echo -e "\n🛠️  Instalando o ScannerDNS...\n"
+# Caminho base onde será instalado o ScannerDNS
+PASTA="$HOME/Documentos/ScannerDNS"
 
-# Diretório base
-if [ "$PREFIX" ]; then
-  FINAL_DIR="$HOME/Documentos/ScannerDNS"
-  BIN_DIR="$PREFIX/bin"
+# Criando pasta se não existir
+mkdir -p "$PASTA"
+
+# Clonando ou atualizando repositório
+if [ -d "$PASTA/.git" ]; then
+    echo "🔄 Atualizando projeto existente..."
+    git -C "$PASTA" pull
 else
-  FINAL_DIR="$HOME/Documentos/ScannerDNS"
-  BIN_DIR="/usr/local/bin"
+    echo "📥 Baixando projeto ScannerDNS..."
+    git clone https://github.com/ffontinele/scanner-dns "$PASTA"
 fi
 
-# Criar pastas, se não existirem
-mkdir -p "$FINAL_DIR"
+# Indo para o diretório
+cd "$PASTA" || exit 1
 
-# Limpar instalação anterior
-echo -e "🧹 Limpando instalações anteriores..."
-rm -rf "$FINAL_DIR"
-rm -f "$BIN_DIR/scanner"
-
-# Clonar repositório
-echo -e "📥 Baixando arquivos do GitHub..."
-git clone https://github.com/ffontinele/scanner-dns.git "$FINAL_DIR"
-
-# Criar lista.txt com domínios de teste
-echo -e "🌐 Criando lista padrão de domínios (lista.txt)..."
-cat <<EOF > "$FINAL_DIR/lista.txt"
+# Garantir que lista.txt existe e tem alguns domínios
+if [ ! -s lista.txt ]; then
+    echo "🌐 Criando arquivo lista.txt com domínios de teste..."
+    cat <<EOF > lista.txt
 www.google.com
 www.cloudflare.com
 www.wikipedia.org
 www.youtube.com
 EOF
+else
+    echo "📄 lista.txt já existe e não está vazia."
+fi
 
-# Garantir permissão de execução
-chmod +x "$FINAL_DIR/scanner.sh"
+# Tornando scanner.sh executável
+chmod +x scanner.sh
 
-# Criar atalho global
-echo -e "🔗 Criando atalho global..."
-echo -e "#!/bin/bash\nbash \"$FINAL_DIR/scanner.sh\" \"\$@\"" > "$BIN_DIR/scanner"
-chmod +x "$BIN_DIR/scanner"
+# Criando atalho global 'scanner'
+mkdir -p "$HOME/bin"
+ln -sf "$PASTA/scanner.sh" "$HOME/bin/scanner"
 
-echo -e "\n✅ ScannerDNS instalado com sucesso!"
-echo -e "📁 Diretório: $FINAL_DIR"
-echo -e "📌 Use o comando: \033[1;32mscanner\033[0m para iniciar.\n"
+# Garantindo que o $HOME/bin está no PATH
+if ! echo "$PATH" | grep -q "$HOME/bin"; then
+    echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.bashrc"
+    echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.profile"
+    echo '🔧 PATH atualizado. Reinicie o Termux ou terminal para aplicar.'
+fi
+
+# Confirmação final
+echo
+echo "✅ Instalação concluída!"
+echo "📁 Caminho: $PASTA"
+echo "🚀 Use o comando: scanner"
